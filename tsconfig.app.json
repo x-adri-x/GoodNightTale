@@ -13,8 +13,6 @@
     "noImplicitAny": true,
     "noEmitOnError": true,
     "noImplicitReturns": true,
-
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
