@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
+import { useRouter } from 'vue-router'
 import OpenAI from 'openai'
 
 import TextInput from './TextInput.vue'
@@ -11,7 +12,7 @@ const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPEN_API_KEY,
   dangerouslyAllowBrowser: true
 })
-
+const router = useRouter()
 const keyword = ref('')
 const keywords: Ref<string[]> = ref([])
 const handleClick = () => {
@@ -20,16 +21,23 @@ const handleClick = () => {
 }
 
 const callChatGPT = async () => {
-  const completion = await openai.chat.completions.create({
-    messages: [
-      {
-        role: 'system',
-        content: constants.prompt
-      },
-      { role: 'user', content: createPromptMessage(keywords.value) }
-    ],
-    model: 'gpt-3.5-turbo'
-  })
+  router.push('/content')
+  const completion =
+    await openai.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: constants.prompt
+        },
+        {
+          role: 'user',
+          content: createPromptMessage(
+            keywords.value
+          )
+        }
+      ],
+      model: 'gpt-3.5-turbo'
+    })
 
   console.log(completion.choices[0].message)
 }
@@ -38,8 +46,14 @@ const callChatGPT = async () => {
   <div>
     <h1>Let's get started!</h1>
     <TextInput v-model="keyword" />
-    <ButtonPrimary text="Add keyword" @click="handleClick" />
-    <ButtonPrimary text="Test GPT prompt" @click="callChatGPT" />
+    <ButtonPrimary
+      text="Add keyword"
+      @click="handleClick"
+    />
+    <ButtonPrimary
+      text="Generate Tale"
+      @click="callChatGPT"
+    />
   </div>
 </template>
 

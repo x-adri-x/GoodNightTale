@@ -2,6 +2,10 @@
 import { defineProps } from 'vue'
 
 defineProps({
+  title: {
+    type: String,
+    required: true
+  },
   text: {
     type: String,
     required: true
@@ -9,5 +13,5 @@ defineProps({
 })
 </script>
 <template>
-  <v-btn variant="tonal">{{ text }}</v-btn>
+  <v-alert color="error" icon="$error" title="title" text="text"></v-alert>
 </template>
