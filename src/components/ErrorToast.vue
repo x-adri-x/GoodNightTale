@@ -13,5 +13,5 @@ defineProps({
 })
 </script>
 <template>
-  <v-alert color="error" icon="$error" title="title" text="text"></v-alert>
+  <v-alert color="error" icon="$error" :title="title" :text="text"></v-alert>
 </template>
