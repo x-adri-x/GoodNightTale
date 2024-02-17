@@ -37,8 +37,7 @@ module.exports = {
         peerDependencies: false
       }
     ],
-    'import/no-unresolved': 'off',
-    'no-console': 'off'
+    'import/no-unresolved': 'off'
   },
   settings: {
     'import/resolver': {
