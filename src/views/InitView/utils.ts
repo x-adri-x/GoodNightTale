@@ -30,7 +30,7 @@ export const callChatGPT = async (
   try {
     completion = await openai.chat.completions.create({ messages, model: constants.model })
   } catch {
-    taleStore.isFailed = true
+    taleStore.isTaleRequestFailed = true
   }
   return completion
 }

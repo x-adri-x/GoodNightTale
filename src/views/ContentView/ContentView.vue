@@ -3,18 +3,21 @@ import { ref, watch } from 'vue'
 import OpenAI from 'openai'
 import useGoodNightTaleStore from '@/stores/goodnighttale'
 import ErrorToast from '@/components/ErrorToast.vue'
+import PageSwiper from './PageSwiper.vue'
 import constants from '@/constants/constants.ts'
 import useImagesStore from '@/stores/images'
 import usePromptsStore from '@/stores/prompts'
+import usePagesStore from '@/stores/pages'
 
 const taleStore = useGoodNightTaleStore()
 const imagesStore = useImagesStore()
 const promptStore = usePromptsStore()
+const pagesStore = usePagesStore()
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPEN_API_KEY,
   dangerouslyAllowBrowser: true
 })
-taleStore.getTaleFromLocalStorage()
+pagesStore.getPagesFromLocalStorage()
 const loading = ref(true)
 
 const callDallE = async (prompt: string) => {
@@ -27,7 +30,7 @@ const callDallE = async (prompt: string) => {
       size: '1024x1024'
     })
   } catch {
-    taleStore.isFailed = true
+    imagesStore.isImageRequestFailed = true
   }
 
   return response
@@ -36,7 +39,7 @@ const callDallE = async (prompt: string) => {
 watch(
   () => taleStore.tale,
   () => {
-    if (taleStore.tale || taleStore.isFailed) {
+    if (taleStore.tale || taleStore.isTaleRequestFailed) {
       loading.value = false
     }
   },
@@ -52,21 +55,41 @@ watch(
     })
   }
 )
+imagesStore.$subscribe(async () => {
+  if (imagesStore.imageUrls.length === 2) {
+    pagesStore.$reset()
+    const parts = taleStore.tale?.split('\n\n')
+    if (parts) {
+      pagesStore.pages.push(parts[0].split(': ')[1])
+      pagesStore.pages.push(imagesStore.imageUrls[0])
+      pagesStore.pages.push(parts[1])
+      pagesStore.pages.push(imagesStore.imageUrls[1])
+      pagesStore.pages.push(parts[2])
+      pagesStore.pages.push(parts[3])
+    }
+    console.log(pagesStore.pages)
+    pagesStore.savePagesToLocalStorage()
+  }
+})
 </script>
 <template>
   <div>
     <ErrorToast
-      v-if="taleStore.isFailed"
+      v-if="taleStore.isTaleRequestFailed"
       :title="constants.networkErrorTitle"
       :text="constants.networkErrorMessage"
     />
   </div>
   <div>
     <v-card
-      v-if="!taleStore.isFailed"
+      v-if="pagesStore.pages.length === 0"
       :loading="loading"
-      :text="taleStore.tale as string"
+      :text="!taleStore.tale ? constants.taleIsLoadingText : constants.imageIsLoadingText"
       variant="tonal"
     ></v-card>
+    <PageSwiper
+      v-if="pagesStore.pages && pagesStore.pages.length > 0"
+      :slides="pagesStore.pages"
+    ></PageSwiper>
   </div>
 </template>

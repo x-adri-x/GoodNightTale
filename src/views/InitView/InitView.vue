@@ -7,13 +7,16 @@ import constants from '@/constants/constants.ts'
 import { callChatGPT, extractPromptsForImages } from './utils'
 import useGoodNightTaleStore from '@/stores/goodnighttale'
 import usePromptsStore from '@/stores/prompts'
+import usePagesStore from '@/stores/pages'
 
 const taleStore = useGoodNightTaleStore()
 const promptStore = usePromptsStore()
+const pagesStore = usePagesStore()
 const router = useRouter()
 const keyword = ref('')
 const keywords: Ref<string[]> = ref([])
 
+pagesStore.clearLocalStorage()
 watch(keywords.value, () => {
   promptStore.updatePrompt({
     role: 'user',

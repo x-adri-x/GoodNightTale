@@ -4,7 +4,7 @@ import constants from '@/constants/constants'
 
 const useImagesStore = defineStore('image', () => {
   const imageUrls: Ref<Array<string | undefined>> = ref([])
-  const isFailed = ref(false)
+  const isImageRequestFailed = ref(false)
 
   function saveImagesToLocalStorage() {
     localStorage.setItem(constants.imagesStorageKey, JSON.stringify(imageUrls.value))
@@ -25,7 +25,7 @@ const useImagesStore = defineStore('image', () => {
 
   return {
     imageUrls,
-    isFailed,
+    isImageRequestFailed,
     saveImagesToLocalStorage,
     getImagesFromLocalStorage
   }

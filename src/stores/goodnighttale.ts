@@ -4,7 +4,7 @@ import constants from '@/constants/constants'
 
 const useGoodNightTaleStore = defineStore('tale', () => {
   const tale: Ref<string | null | undefined> = ref('')
-  const isFailed = ref(false)
+  const isTaleRequestFailed = ref(false)
 
   function saveTaleToLocalStorage() {
     localStorage.setItem(constants.taleStorageKey, JSON.stringify(tale.value))
@@ -25,7 +25,7 @@ const useGoodNightTaleStore = defineStore('tale', () => {
 
   return {
     tale,
-    isFailed,
+    isTaleRequestFailed,
     saveTaleToLocalStorage,
     getTaleFromLocalStorage
   }
