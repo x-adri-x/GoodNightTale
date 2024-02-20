@@ -5,9 +5,13 @@ defineProps({
   text: {
     type: String,
     required: true
+  },
+  isDisabled: {
+    type: Boolean,
+    required: false
   }
 })
 </script>
 <template>
-  <v-btn variant="tonal">{{ text }}</v-btn>
+  <v-btn variant="tonal" :disabled="isDisabled">{{ text }}</v-btn>
 </template>

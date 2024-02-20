@@ -67,7 +67,6 @@ imagesStore.$subscribe(async () => {
       pagesStore.pages.push(parts[2])
       pagesStore.pages.push(parts[3])
     }
-    console.log(pagesStore.pages)
     pagesStore.savePagesToLocalStorage()
   }
 })

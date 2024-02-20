@@ -18,6 +18,8 @@ const constants: Constants = {
   networkErrorTitle: 'Network request error.',
   networkErrorMessage:
     'Something went wrong when trying to generate your tale. Please check your connection and try again.',
+  inputInfoMessage: 'Please add 5 keywords of your choice or choose from the provided list.',
+  duplicateWordWarning: 'You already have that word selected.',
   taleStorageKey: 'tale',
   iamgesStorageKey: 'illustration',
   pagesStorageKey: 'pages',
