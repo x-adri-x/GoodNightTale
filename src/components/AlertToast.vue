@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineProps, type PropType } from 'vue'
+
+type Variant = 'info' | 'warning' | 'error'
 
 const props = defineProps({
   title: {
@@ -11,7 +13,7 @@ const props = defineProps({
     required: true
   },
   variant: {
-    type: String,
+    type: String as PropType<Variant>,
     required: true
   }
 })
