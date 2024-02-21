@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import OpenAI from 'openai'
 import useGoodNightTaleStore from '@/stores/goodnighttale'
-import ErrorToast from '@/components/ErrorToast.vue'
+import AlertToast from '@/components/AlertToast.vue'
 import PageSwiper from './PageSwiper.vue'
 import constants from '@/constants/constants.ts'
 import useImagesStore from '@/stores/images'
@@ -37,22 +37,16 @@ const callDallE = async (prompt: string) => {
 }
 
 watch(
-  () => taleStore.tale,
-  () => {
-    if (taleStore.tale || taleStore.isTaleRequestFailed) {
-      loading.value = false
-    }
-  },
-  { immediate: true }
-)
-watch(
   () => promptStore.imagesPrompts,
-  () => {
+  async () => {
+    const promises: Promise<OpenAI.ImagesResponse | undefined>[] = []
     promptStore.imagesPrompts.forEach(async (prompt: string) => {
-      const completion = await callDallE(prompt)
-      const url = await completion?.data[0].url
-      imagesStore.imageUrls.push(url)
+      promises.push(Promise.resolve(callDallE(prompt)))
     })
+    const response = await Promise.all(promises)
+    imagesStore.imageUrls = await response.map((r) => r?.data[0].url)
+    imagesStore.created = Date.now()
+    imagesStore.saveCreatedToLocalStorage()
   }
 )
 imagesStore.$subscribe(async () => {
@@ -73,10 +67,11 @@ imagesStore.$subscribe(async () => {
 </script>
 <template>
   <div>
-    <ErrorToast
+    <AlertToast
       v-if="taleStore.isTaleRequestFailed"
       :title="constants.networkErrorTitle"
       :text="constants.networkErrorMessage"
+      variant="error"
     />
   </div>
   <div>
