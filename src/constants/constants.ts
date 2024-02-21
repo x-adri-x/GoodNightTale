@@ -23,6 +23,8 @@ const constants: Constants = {
   taleStorageKey: 'tale',
   iamgesStorageKey: 'illustration',
   pagesStorageKey: 'pages',
+  randomWordsStorageKey: 'random',
+  createdAtStorageKey: 'createdAt',
   taleIsLoadingText: 'Your tale is being written.',
   imageIsLoadingText: 'Illustrations are being painted.'
 }
