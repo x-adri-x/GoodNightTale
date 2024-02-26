@@ -21,8 +21,6 @@ const keywords: Ref<string[]> = ref([])
 const showWarning = ref(false)
 const randomWords = ref(getRandomWords())
 
-console.log('openai api key', process.env.OPENAI_API_KEY)
-
 const handleClick = () => {
   if (!keywords.value.includes(keyword.value)) {
     keywords.value.push(keyword.value)
