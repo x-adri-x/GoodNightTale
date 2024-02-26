@@ -68,8 +68,13 @@ const selectRandomWord = (word: string) => {
 </script>
 <template>
   <div class="container">
-    <h1>Let's get started!</h1>
-    <AlertToast closable :text="constants.inputInfoMessage" variant="info"></AlertToast>
+    <h1 aria-label="Let's get started">Let's get started!</h1>
+    <AlertToast
+      closable
+      :text="constants.inputInfoMessage"
+      variant="info"
+      data-test="info-toast"
+    ></AlertToast>
 
     <v-text-field
       v-model="keyword"
