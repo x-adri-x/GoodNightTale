@@ -6,11 +6,21 @@ const router = useRouter()
 </script>
 
 <template>
-  <div class="main-container">
+  <div class="container">
     <h1>The Good Night Tale</h1>
-    <ButtonPrimary
-      text="Tell me a tale!"
-      @click="router.push('/init')"
-    />
+    <img src="../assets/logo.png" alt="logo" width="200px" />
+    <ButtonPrimary class="btn" text="Tell me a tale!" @click="router.push('/init')" />
   </div>
 </template>
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+  height: 70vh;
+}
+
+.btn {
+  margin-top: auto;
+}
+</style>
