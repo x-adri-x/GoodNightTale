@@ -2,3 +2,5 @@ node_modules
 test-results/
 playwright-report/
 .env.local
+.DS_Store
+src/.DS_Store
