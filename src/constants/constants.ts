@@ -3,7 +3,9 @@ type Constants = {
 }
 
 const constants: Constants = {
-  model: 'gpt-3.5-turbo',
+  chatModel: 'gpt-3.5-turbo',
+  imageModel: 'dall-e-3',
+  numberOfImages: '1',
   chatGPTPrompt:
     'I will provide you with 5 random words, and I would like you to write me ' +
     'a short tale out of those 5 words. It should be between 80 and a 100 words, ' +
@@ -18,15 +20,18 @@ const constants: Constants = {
   networkErrorTitle: 'Network request error.',
   networkErrorMessage:
     'Something went wrong when trying to generate your tale. Please check your connection and try again.',
+  imageRequestErrorMessage: 'Something went wrong when trying to generate images for your tale.',
   inputInfoMessage: 'Please add 5 keywords of your choice or choose from the provided list.',
   duplicateWordWarning: 'You already have that word selected.',
   taleStorageKey: 'tale',
-  iamgesStorageKey: 'illustration',
+  imagesStorageKey: 'illustration',
   pagesStorageKey: 'pages',
   randomWordsStorageKey: 'random',
   createdAtStorageKey: 'createdAt',
   taleIsLoadingText: 'Your tale is being written.',
-  imageIsLoadingText: 'Illustrations are being painted.'
+  imageIsLoadingText: 'Illustrations are being painted.',
+  dallEImageValidTime: '1',
+  imageIndexes: '1,3'
 }
 
 export default constants
