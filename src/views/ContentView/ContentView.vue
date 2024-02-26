@@ -1,89 +1,146 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import OpenAI from 'openai'
+import { watch, ref } from 'vue'
 import useGoodNightTaleStore from '@/stores/goodnighttale'
 import AlertToast from '@/components/AlertToast.vue'
-import PageSwiper from './PageSwiper.vue'
+import CarouselComponent from '@/views/ContentView/CarouselComponent.vue'
+import CarouselSlide from '@/views/ContentView/CarouselSlide.vue'
 import constants from '@/constants/constants.ts'
 import useImagesStore from '@/stores/images'
 import usePromptsStore from '@/stores/prompts'
 import usePagesStore from '@/stores/pages'
+import { compareCreatedAt, generateImages, createPages, addNewImages } from './utils'
+import { callChatGPT, extractPromptsForImages } from '../InitView/utils'
 
 const taleStore = useGoodNightTaleStore()
 const imagesStore = useImagesStore()
 const promptStore = usePromptsStore()
 const pagesStore = usePagesStore()
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPEN_API_KEY,
-  dangerouslyAllowBrowser: true
-})
-pagesStore.getPagesFromLocalStorage()
-const loading = ref(true)
+const imagesRegenerating = ref(false)
 
-const callDallE = async (prompt: string) => {
-  let response
-  try {
-    response = openai.images.generate({
-      model: 'dall-e-3',
-      prompt,
-      n: 1,
-      size: '1024x1024'
-    })
-  } catch {
-    imagesStore.isImageRequestFailed = true
+const checkImageValidity = async () => {
+  pagesStore.pages = pagesStore.getPagesFromLocalStorage()
+  if (pagesStore.pages && compareCreatedAt()) {
+    console.log('Why Lily?')
+    imagesStore.isImagesRequestFailed = false
+    imagesRegenerating.value = true
+    try {
+      const prompts = localStorage.getItem(constants.imagesStorageKey)
+      const response = await generateImages(JSON.parse(prompts!))
+      const imageUrls: string[] = (await response.map((r) => r?.data[0].url)) as string[]
+      const storedPages = localStorage.getItem(constants.pagesStorageKey)
+      const obj: string[] = JSON.parse(storedPages!)
+      pagesStore.pages = addNewImages(obj, imageUrls)
+      pagesStore.savePagesToLocalStorage()
+
+      imagesStore.created = Date.now()
+      imagesStore.saveCreatedToLocalStorage()
+    } catch (error) {
+      imagesStore.isImagesRequestFailed = true
+      throw new Error(`An error has occured while creating the images:  ${error}`)
+    }
+    imagesRegenerating.value = false
   }
-
-  return response
 }
+if (!taleStore.generationInProgress) checkImageValidity()
+
+watch(
+  () => taleStore.tale,
+  async () => {
+    if (!taleStore.isTaleRequestFailed) {
+      promptStore.updatePrompt({ role: 'assistant', content: taleStore.tale })
+      promptStore.updatePrompt({ role: 'user', content: constants.dallEPrompt })
+      try {
+        const response = await callChatGPT(promptStore.stream)
+        const prompts = await response?.choices[0].message.content
+        promptStore.imagesPrompts = extractPromptsForImages(prompts as string)
+        promptStore.saveImagesPromptsToLocalStorage()
+      } catch (error) {
+        taleStore.isTaleRequestFailed = true
+        throw new Error(`Failed to create prompts for DALL-E. ${error}`)
+      }
+    }
+  }
+)
 
 watch(
   () => promptStore.imagesPrompts,
   async () => {
-    const promises: Promise<OpenAI.ImagesResponse | undefined>[] = []
-    promptStore.imagesPrompts.forEach(async (prompt: string) => {
-      promises.push(Promise.resolve(callDallE(prompt)))
-    })
-    const response = await Promise.all(promises)
-    imagesStore.imageUrls = await response.map((r) => r?.data[0].url)
-    imagesStore.created = Date.now()
-    imagesStore.saveCreatedToLocalStorage()
+    try {
+      const response = await generateImages(promptStore.imagesPrompts)
+      imagesStore.imageUrls = response.map((r) => r?.data[0].url)
+      imagesStore.created = Date.now()
+      imagesStore.saveCreatedToLocalStorage()
+    } catch (error) {
+      imagesStore.isImagesRequestFailed = true
+      throw new Error(`An error has occured while creating the images:  ${error}`)
+    }
   }
 )
-imagesStore.$subscribe(async () => {
-  if (imagesStore.imageUrls.length === 2) {
-    pagesStore.$reset()
-    const parts = taleStore.tale?.split('\n\n')
-    if (parts) {
-      pagesStore.pages.push(parts[0].split(': ')[1])
-      pagesStore.pages.push(imagesStore.imageUrls[0])
-      pagesStore.pages.push(parts[1])
-      pagesStore.pages.push(imagesStore.imageUrls[1])
-      pagesStore.pages.push(parts[2])
-      pagesStore.pages.push(parts[3])
+
+watch(
+  () => imagesStore.imageUrls,
+  async () => {
+    if (imagesStore.imageUrls && imagesStore.imageUrls.length === 2) {
+      const parts = taleStore.tale?.split('\n\n')
+      if (parts) {
+        pagesStore.pages = createPages(parts, imagesStore.imageUrls)
+        pagesStore.savePagesToLocalStorage()
+        taleStore.generationInProgress = false
+      }
     }
-    pagesStore.savePagesToLocalStorage()
   }
-})
+)
 </script>
 <template>
-  <div>
-    <AlertToast
-      v-if="taleStore.isTaleRequestFailed"
-      :title="constants.networkErrorTitle"
-      :text="constants.networkErrorMessage"
-      variant="error"
-    />
-  </div>
-  <div>
-    <v-card
-      v-if="pagesStore.pages.length === 0"
-      :loading="loading"
-      :text="!taleStore.tale ? constants.taleIsLoadingText : constants.imageIsLoadingText"
-      variant="tonal"
-    ></v-card>
-    <PageSwiper
-      v-if="pagesStore.pages && pagesStore.pages.length > 0"
-      :slides="pagesStore.pages"
-    ></PageSwiper>
+  <div class="container">
+    <div v-if="taleStore.isTaleRequestFailed || imagesStore.isImagesRequestFailed">
+      <div v-if="taleStore.isTaleRequestFailed">
+        <AlertToast
+          :title="constants.networkErrorTitle"
+          :text="constants.networkErrorMessage"
+          variant="error"
+        />
+      </div>
+      <div v-else>
+        <AlertToast
+          :title="constants.networkErrorTitle"
+          :text="constants.imageRequestErrorMessage"
+          variant="error"
+        />
+      </div>
+    </div>
+    <div v-else>
+      <v-card
+        v-if="taleStore.generationInProgress"
+        loading
+        :text="!taleStore.tale ? constants.taleIsLoadingText : constants.imageIsLoadingText"
+        variant="tonal"
+      ></v-card>
+      <v-card
+        v-else-if="imagesRegenerating"
+        loading
+        :text="constants.imageIsLoadingText"
+        variant="tonal"
+      ></v-card>
+      <div v-else-if="pagesStore.pages && pagesStore.pages.length > 0">
+        <CarouselComponent v-slot="{ currentSlide }">
+          <CarouselSlide v-for="(page, i) in pagesStore.pages" :key="i">
+            <div v-show="i === currentSlide">
+              <img v-if="i === 1 || i === 3" :src="page" width="100%" alt="alt" />
+              <div v-else :class="{ title: i === 0 }">{{ page }}</div>
+            </div>
+          </CarouselSlide>
+        </CarouselComponent>
+      </div>
+    </div>
   </div>
 </template>
+<style scoped>
+img {
+  border-top-right-radius: 15%;
+  border-bottom-right-radius: 15%;
+}
+.title {
+  font-size: 1.3rem;
+}
+</style>
