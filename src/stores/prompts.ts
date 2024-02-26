@@ -12,14 +12,31 @@ const usePromptsStore = defineStore('prompt', () => {
   ])
   const imagesPrompts = ref()
 
+  function $reset() {
+    stream.value = [
+      {
+        role: 'system',
+        content: constants.chatGPTPrompt
+      }
+    ]
+  }
+
   function updatePrompt(message: OpenAI.Chat.Completions.ChatCompletionMessageParam) {
     stream.value.push(message)
   }
 
+  function saveImagesPromptsToLocalStorage() {
+    localStorage.setItem(constants.imagesStorageKey, JSON.stringify(imagesPrompts.value))
+  }
+
+  $reset()
+
   return {
     stream,
+    $reset,
     imagesPrompts,
-    updatePrompt
+    updatePrompt,
+    saveImagesPromptsToLocalStorage
   }
 })
 

@@ -22,8 +22,10 @@ const usePagesStore = defineStore('pages', () => {
   }
 
   function clearLocalStorage() {
-    localStorage.setItem(constants.pagesStorageKey, JSON.stringify(''))
+    localStorage.setItem(constants.pagesStorageKey, JSON.stringify([]))
   }
+
+  $reset()
 
   return {
     $reset,
