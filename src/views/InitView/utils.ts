@@ -2,8 +2,13 @@ import OpenAI from 'openai'
 import { generate } from 'random-words'
 import constants from '@/constants/constants.ts'
 
+const apiKey =
+  process.env.NODE_ENV === 'production'
+    ? process.env.OPENAI_API_KEY
+    : import.meta.env.VITE_OPEN_API_KEY
+
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPEN_API_KEY,
+  apiKey,
   dangerouslyAllowBrowser: true
 })
 
