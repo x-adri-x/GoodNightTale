@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { mdiCheckCircle } from '@mdi/js'
 import ButtonPrimary from '@/components/ButtonPrimary.vue'
 import AlertToast from '@/components/AlertToast.vue'
+import AppHeader from '@/components/AppHeader.vue'
 import constants from '@/constants/constants.ts'
 import { callChatGPT, generateRandomWords, getRandomWords } from './utils'
 import useGoodNightTaleStore from '@/stores/goodnighttale'
@@ -67,7 +68,8 @@ const selectRandomWord = (word: string) => {
 }
 </script>
 <template>
-  <div class="container">
+  <AppHeader />
+  <div class="container init">
     <h1 aria-label="Let's get started">Let's get started!</h1>
     <AlertToast
       closable
@@ -81,7 +83,7 @@ const selectRandomWord = (word: string) => {
       theme="primary-darken-1"
       :disabled="keywords.length === 5"
       :rules="[(value) => value.length <= 9]"
-      label="Title"
+      label="Keyword"
       counter
       maxlength="9"
       @keyup.enter="handleClick"
@@ -92,7 +94,7 @@ const selectRandomWord = (word: string) => {
       :text="constants.duplicateWordWarning"
       variant="warning"
     ></AlertToast>
-    <div class="random-chip-container">
+    <div class="random-chip-container" data-test="selected">
       <v-chip
         v-for="keyword in keywords"
         :key="keyword"
@@ -104,12 +106,13 @@ const selectRandomWord = (word: string) => {
     </div>
     <p
       class="link"
+      data-test="regenerate-words"
       @click="randomWords = generateRandomWords()"
       @keyup="randomWords = generateRandomWords()"
     >
       Regenerate random list
     </p>
-    <div class="random-chip-container">
+    <div class="random-chip-container" data-test="chip-container">
       <v-chip
         v-for="(word, index) in randomWords"
         :key="index"
@@ -119,7 +122,12 @@ const selectRandomWord = (word: string) => {
         >{{ word }}</v-chip
       >
     </div>
-    <ButtonPrimary text="Generate Tale" :isDisabled="keywords.length < 5" @click="generateTale" />
+    <ButtonPrimary
+      text="Generate Tale"
+      class="btn"
+      :isDisabled="keywords.length < 5"
+      @click="generateTale"
+    />
   </div>
 </template>
 
@@ -131,10 +139,20 @@ const selectRandomWord = (word: string) => {
   margin: 40px 0;
 }
 
-.link {
-  text-decoration-line: underline;
+.btn {
+  width: 80vw;
+  height: 50px;
+}
+
+.link:hover {
+  border-bottom: none;
 }
 .chip {
   justify-content: center;
+}
+@media (width >= 768px) {
+  .init {
+    max-width: 650px;
+  }
 }
 </style>

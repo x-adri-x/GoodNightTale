@@ -13,7 +13,5 @@ defineProps({
 })
 </script>
 <template>
-  <v-btn variant="tonal" width="80vh" height="50px" class="rounded-lg" :disabled="isDisabled">{{
-    text
-  }}</v-btn>
+  <v-btn variant="tonal" class="rounded-lg" :disabled="isDisabled">{{ text }}</v-btn>
 </template>

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { watch, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import useGoodNightTaleStore from '@/stores/goodnighttale'
 import AlertToast from '@/components/AlertToast.vue'
 import CarouselComponent from '@/views/ContentView/CarouselComponent.vue'
 import CarouselSlide from '@/views/ContentView/CarouselSlide.vue'
+import AppHeader from '@/components/AppHeader.vue'
 import constants from '@/constants/constants.ts'
 import useImagesStore from '@/stores/images'
 import usePromptsStore from '@/stores/prompts'
@@ -11,6 +13,7 @@ import usePagesStore from '@/stores/pages'
 import { compareCreatedAt, generateImages, createPages, addNewImages } from './utils'
 import { callChatGPT, extractPromptsForImages } from '../InitView/utils'
 
+const router = useRouter()
 const taleStore = useGoodNightTaleStore()
 const imagesStore = useImagesStore()
 const promptStore = usePromptsStore()
@@ -20,7 +23,6 @@ const imagesRegenerating = ref(false)
 const checkImageValidity = async () => {
   pagesStore.pages = pagesStore.getPagesFromLocalStorage()
   if (pagesStore.pages && compareCreatedAt()) {
-    console.log('Why Lily?')
     imagesStore.isImagesRequestFailed = false
     imagesRegenerating.value = true
     try {
@@ -92,7 +94,8 @@ watch(
 )
 </script>
 <template>
-  <div class="container">
+  <AppHeader />
+  <div class="container content">
     <div v-if="taleStore.isTaleRequestFailed || imagesStore.isImagesRequestFailed">
       <div v-if="taleStore.isTaleRequestFailed">
         <AlertToast
@@ -132,6 +135,12 @@ watch(
           </CarouselSlide>
         </CarouselComponent>
       </div>
+      <div v-else>
+        <p class="fallback-msg" data-test="fallback-msg">There is nothing to show.</p>
+        <p class="link" data-test="home-link" @click="router.push('/')" @keyup="router.push('/')">
+          Home
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -142,5 +151,19 @@ img {
 }
 .title {
   font-size: 1.3rem;
+}
+.fallback-msg {
+  font-size: 3rem;
+}
+.link {
+  font-size: 1.5rem;
+}
+@media (width >= 768px) {
+  .content {
+    width: 650px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }
 </style>
