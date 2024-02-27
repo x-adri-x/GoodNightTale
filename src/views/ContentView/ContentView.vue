@@ -10,7 +10,7 @@ import constants from '@/constants/constants.ts'
 import useImagesStore from '@/stores/images'
 import usePromptsStore from '@/stores/prompts'
 import usePagesStore from '@/stores/pages'
-import { compareCreatedAt, generateImages, createPages, addNewImages } from './utils'
+import { areImagesOutdated, generateImages, createPages, addNewImages } from './utils'
 import { callChatGPT, extractPromptsForImages } from '../InitView/utils'
 
 const router = useRouter()
@@ -22,7 +22,7 @@ const imagesRegenerating = ref(false)
 
 const checkImageValidity = async () => {
   pagesStore.pages = pagesStore.getPagesFromLocalStorage()
-  if (pagesStore.pages && compareCreatedAt()) {
+  if (pagesStore.pages && areImagesOutdated()) {
     imagesStore.isImagesRequestFailed = false
     imagesRegenerating.value = true
     try {

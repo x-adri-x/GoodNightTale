@@ -27,7 +27,7 @@ const mobileView = ref(window.innerWidth < 768)
 }
 
 .headings {
-  margin-top: 30vh;
+  margin-top: 20vh;
 }
 
 h1 {

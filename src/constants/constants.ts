@@ -8,7 +8,7 @@ const constants: Constants = {
   numberOfImages: '1',
   chatGPTPrompt:
     'I will provide you with 5 random words, and I would like you to write me ' +
-    'a short tale out of those 5 words. It should be between 80 and a 100 words, ' +
+    'a short tale out of those 5 words. It should be between 200 and 300 words, ' +
     'and it should be something clever and nice, suitable for small kids to enjoy ' +
     'before bedtime. Give it a fitting title as well, in the form "Title: ". Use a ' +
     'single line break to separate the title from the tale, and also to create 3 ' +
@@ -30,7 +30,7 @@ const constants: Constants = {
   createdAtStorageKey: 'createdAt',
   taleIsLoadingText: 'Your tale is being written.',
   imageIsLoadingText: 'Illustrations are being painted.',
-  dallEImageValidTime: '1',
+  dallEImageValidTime: '50',
   imageIndexes: '1,3'
 }
 

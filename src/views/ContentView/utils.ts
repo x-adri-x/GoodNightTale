@@ -11,7 +11,7 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true
 })
 
-export const compareCreatedAt = () => {
+export const areImagesOutdated = () => {
   const createdAt = localStorage.getItem(constants.createdAtStorageKey)
   let minutesPassed = 0
   if (createdAt) {
