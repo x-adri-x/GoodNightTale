@@ -22,7 +22,7 @@ const mobileView = ref(window.innerWidth < 768)
   flex-direction: column;
   align-items: center;
   height: 100vh;
-  background-image: url('../assets/kenrick-mills.jpeg');
+  background-image: url('../assets/kenrick-mills.png');
   background-size: cover;
 }
 
