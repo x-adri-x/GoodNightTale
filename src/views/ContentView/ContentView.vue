@@ -152,9 +152,7 @@ img {
 .title {
   font-size: 1.3rem;
 }
-.fallback-msg {
-  font-size: 3rem;
-}
+
 .link {
   font-size: 1.5rem;
 }
